@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mikeraimondi/coelacanth"
+	"github.com/knollit/coelacanth"
 )
 
 var (
@@ -79,14 +79,14 @@ func RegisterAfterCallback(cb func() error) {
 // RunWithDB executes testFunc with a prepared test database connection
 func RunWithDB(t *testing.T, testFunc func(*TestDB)) {
 	if commonDB == nil {
-		db, _ := sql.Open("postgres", "user=mike host=localhost dbname=postgres sslmode=disable")
+		db, _ := sql.Open("postgres", "user=ubuntu host=localhost dbname=postgres sslmode=disable")
 		if err := db.Ping(); err != nil {
 			t.Fatal("Error opening DB: ", err)
 		}
 		db.Exec("DROP DATABASE IF EXISTS endpoints_test")
 		db.Exec("CREATE DATABASE endpoints_test")
 		db.Close()
-		commonDB, _ = sql.Open("postgres", "user=mike host=localhost dbname=endpoints_test sslmode=disable")
+		commonDB, _ = sql.Open("postgres", "user=ubuntu host=localhost dbname=endpoints_test sslmode=disable")
 		RegisterAfterCallback(func() error {
 			return commonDB.Close()
 		})
