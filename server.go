@@ -92,8 +92,3 @@ func (s *Server) GetPrefixedBuf() *prefixedio.Buffer {
 func (s *Server) PutPrefixedBuf(b *prefixedio.Buffer) {
 	s.prefixedBufPool.Put(b)
 }
-
-func (s *Server) GetAddr() string {
-	listener, _ := s.listenFunc("")
-	return listener.Addr().String()
-}

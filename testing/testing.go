@@ -114,16 +114,16 @@ func RunWithDB(t *testing.T, testFunc func(*TestDB)) {
 }
 
 // RunWithServer executes testFunc with a prepared server
-func RunWithServer(t *testing.T, handler func(net.Conn, *coelacanth.Server), testFunc func(*coelacanth.Server)) {
+func RunWithServer(t *testing.T, handler func(net.Conn, *coelacanth.Server), testFunc func(*coelacanth.Server, net.Addr)) {
 	RunWithDB(t, func(db *TestDB) {
 		// Setup server
-		rdy := make(chan int)
+		addrChan := make(chan net.Addr)
 		conf := &coelacanth.Config{
 			DB: db,
 			ListenerFunc: func(addr string) (net.Listener, error) {
 				l, err := net.Listen("tcp", addr)
 				if err == nil {
-					rdy <- 1
+					addrChan <- l.Addr()
 				}
 				return l, err
 			},
@@ -146,8 +146,8 @@ func RunWithServer(t *testing.T, handler func(net.Conn, *coelacanth.Server), tes
 			t.Fatal(err)
 		case <-time.NewTimer(5 * time.Second).C:
 			t.Fatal("Timed out waiting for server to start")
-		case <-rdy:
-			testFunc(s)
+		case addr := <-addrChan:
+			testFunc(s, addr)
 		}
 	})
 	return
