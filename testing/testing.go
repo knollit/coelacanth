@@ -95,7 +95,10 @@ func RunWithDB(t *testing.T, testFunc func(*TestDB)) {
 	testDB := &TestDB{
 		DB: commonDB,
 	}
-	setupSQL, _ := ioutil.ReadFile("db/db.sql")
+	setupSQL, err := ioutil.ReadFile("db/db.sql")
+	if err != nil {
+		t.Fatal("Error reading DB setup script: ", err)
+	}
 	if _, err := testDB.DB.Exec(string(setupSQL)); err != nil {
 		t.Fatal("Error setting up DB: ", err)
 	}
