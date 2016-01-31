@@ -1,6 +1,7 @@
 package testing
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"io/ioutil"
@@ -22,7 +23,9 @@ type logWriter struct {
 }
 
 func (l *logWriter) Write(p []byte) (n int, err error) {
-	l.Log(string(p))
+	for _, line := range bytes.Split(p, []byte("\n")) {
+		l.Logf("%s", bytes.TrimSpace(line))
+	}
 	return len(p), nil
 }
 
