@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/google/flatbuffers/go"
 	"github.com/mikeraimondi/prefixedio"
@@ -43,8 +44,17 @@ type Server struct {
 }
 
 func (s *Server) Run(addr string, handler func(net.Conn, *Server)) error {
-	if err := s.DB.Ping(); err != nil {
-		return err
+	attempts := 0
+	for {
+		if err := s.DB.Ping(); err != nil {
+			attempts++
+			if attempts >= 10 {
+				return err
+			}
+			time.Sleep(time.Second)
+		} else {
+			break
+		}
 	}
 	listener, err := s.listenFunc(addr)
 	if err != nil {
